@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface ICasoService {
 
+    //TODO: Agregar excepciones personalizadas.
+
     List<CasoDTO> getAll();
 
     CasoDTO save(CasoDTO caso);
