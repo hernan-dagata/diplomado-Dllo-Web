@@ -8,6 +8,7 @@ import co.edu.iudigital.app.services.ifaces.IDelitoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,12 +32,13 @@ public class DelitoServiceImpl implements IDelitoService {
         return respDelitos;
     }
 
-
     @Override
-    public DelitoDTO save(DelitoDTORequest delitoDTO) {
+    public DelitoDTO save(DelitoDTORequest delitoDTORequest) {
         Delito delito = new Delito();
-        delito.setNombre(delitoDTO.getNombre());
-        delito.setDescripcion(delitoDTO.getDescripcion());
+        delito.setNombre(delitoDTORequest.getNombre());
+        delito.setDescripcion(delitoDTORequest.getDescripcion());
+
+        delito = delitoRepository.save(delito);
 
         return DelitoDTO.builder()
                 .id(delito.getId())
@@ -45,10 +47,9 @@ public class DelitoServiceImpl implements IDelitoService {
                 .build();
     }
 
-    @Override
     public DelitoDTO getById(Long id) {
         Optional<Delito> delitoOptional = delitoRepository.findById(id);
-        if (delitoOptional.isPresent()){
+        if (delitoOptional.isPresent()) {
             Delito delito = delitoOptional.get();
             return DelitoDTO.builder()
                     .id(delito.getId())
@@ -56,12 +57,27 @@ public class DelitoServiceImpl implements IDelitoService {
                     .descripcion(delito.getDescripcion())
                     .build();
         } else {
-            return null;
+            throw new EntityNotFoundException("Delito con ID " + id + " no encontrado");
         }
     }
 
     @Override
     public void deleteById(Long id) {
         delitoRepository.deleteById(id);
+    }
+
+    @Override
+    public DelitoDTO update(Long id, DelitoDTORequest delitoDTORequest) {
+        Delito delito = delitoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Delito con ID " + id + " no encontrado"));
+
+        delito.setNombre(delitoDTORequest.getNombre());
+        delito.setDescripcion(delitoDTORequest.getDescripcion());
+        delitoRepository.save(delito);
+        return DelitoDTO.builder()
+                .id(delito.getId())
+                .nombre(delito.getNombre())
+                .descripcion(delito.getDescripcion())
+                .build();
     }
 }

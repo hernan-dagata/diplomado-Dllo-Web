@@ -15,11 +15,13 @@ import javax.persistence.*;
 public class Delito {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     @Column(name = "nombre", nullable = false,
             unique = true, length = 120)
     String nombre;
+
     @Column(nullable = true, length = 255)
     String descripcion;
 
